@@ -14,7 +14,7 @@ from pip._vendor import requests
 
 KRAKEN_API_KEY = os.getenv("KRAKEN_API_PRIVATE_KEY", default="")
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
-ASSETPAIRS = '/0/public/AssetPairs?pair={},{}'
+ASSETPAIRS = '/0/public/AssetPairs?pair={},{}?assetVersion=1'
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,7 @@ class Cthulhu:
         self.private_api_key = self._get_api_key()
         self.api_domain = KRAKEN_DOMAIN
         self.asset = self._get_asset()
+        self.tradable_asset = self._get_tradable_asset()
 
     def _get_api_key(self):
         """
@@ -64,14 +65,31 @@ class Cthulhu:
         Allows you to retrieve information on assets
         :return:
         """
-        resp_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/Assets')).json()
+        resp_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/Assets?assetVersion=1')).json()
         resp_asset_df = pd.DataFrame(resp_asset.get('result')).transpose()
         return resp_asset_df
 
-    def get_tradable_asset(self, asset_one: str, asset_two: str) -> json:
-        """
+    def _get_tradable_asset(self) -> pd.DataFrame:
+        resp_trbl_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/AssetPairs?assetVersion=1')).json()
+        return pd.DataFrame(resp_trbl_asset.get('result')).transpose()
 
+    def _convert_asset_to_version0(self, asset: str) -> str:
         """
+        Convert asset name to version 0
+        :param asset:
+        :return:
+        """
+        trbl = self.asset.loc[asset]
+        return trbl.altname
+
+    def get_pair_asset(self, asset_one: str, asset_two: str) -> json:
+        """
+        To find the pair we need to convert the assets to version 1 first.
+        Then the function allows to find the asset pair from 2 asset strings
+        """
+        trdbl = self._get_tradable_asset()
+        asset_one = self._convert_asset_to_version0(asset_one)
+        asset_two = self._convert_asset_to_version0(asset_two)
         if self._is_asset(asset_one) and self._is_asset(asset_two):
             pair = ASSETPAIRS.format(asset_one, asset_one)
             resp_trade = requests.get(KRAKEN_DOMAIN.format(pair)).json()
@@ -79,9 +97,8 @@ class Cthulhu:
         else:
             raise("Error: Asset name doesn't exist")
 
-
     def _is_asset(self, name_asset: str) -> bool:
-        if name_asset in self.asset.altname.values:
+        if name_asset in self.asset.altname.index:
             return True
         else:
             logger.warning("Asset {} don't exist".format(name_asset))
