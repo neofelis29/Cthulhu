@@ -78,19 +78,21 @@ class Cthulhu:
         Allows you to retrieve information on assets
         :return:
         """
-        resp_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/Assets?assetVersion=1')).json()
+        resp_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/Assets?assetVersion=2')).json()
         resp_asset_df = pd.DataFrame(resp_asset.get('result')).transpose()
         return resp_asset_df
 
     def get_asset(self, asset_name: str) -> Asset:
         """
         Retrieves information from an asset and returns an asset object
-        :param asset_name: Name of the asset
+        :param asset_name: Code name of the asset
         :return: Asset object
         """
         if self._is_asset(asset_name):
-            asset = Asset(asset_name, self.assets.loc[asset_name])
-            return asset
+            with open('../codes/asset_code.json') as json_file:
+                codes_assets = json.load(json_file)
+                asset = Asset(asset_name, self.assets.loc[codes_assets.get(asset_name)])
+                return asset
         else:
             logger.warning("Asset {} don't exist".format(asset_name))
             raise Exception("ERROR: Asset don't exist")
@@ -100,7 +102,7 @@ class Cthulhu:
         Retrieves all available assets
         :return: Return a dataframe of all assets
         """
-        resp_trbl_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/AssetPairs?assetVersion=1')).json()
+        resp_trbl_asset = requests.get(KRAKEN_DOMAIN.format('/0/public/AssetPairs?assetVersion=2')).json()
         return pd.DataFrame(resp_trbl_asset.get('result')).transpose()
 
     def get_pair_asset(self, asset_one: Asset, asset_two: Asset) -> AssetPair:
@@ -111,9 +113,9 @@ class Cthulhu:
         :return:
         """
         if self._is_pair_asset(asset_one, asset_two):
-            pair_asset_name = "{}/{}".format(asset_one.name, asset_two.name)
-            trbl = self.tradable_asset.loc[pair_asset_name]
-            return AssetPair(pair_asset_name, trbl)
+            pair_asset_name = "{}/{}".format(asset_one.altname, asset_two.altname)
+            trdbl = self.tradable_asset.loc[(self.tradable_asset.wsname==pair_asset_name)]
+            return AssetPair(asset_one, asset_two, trdbl.squeeze(axis=0))
         else:
             raise BaseException ("Error: pair asset don't exist")
 
@@ -124,23 +126,26 @@ class Cthulhu:
         :param asset_two: Asset object
         :return: True if the pair asset exist
         """
-        str_pair = "{}/{}".format(asset_one.name, asset_two.name)
-        if str_pair in self.tradable_asset.index:
+        str_pair = "{}/{}".format(asset_one.altname, asset_two.altname)
+        wsname = self.tradable_asset.wsname
+        if str_pair in self.tradable_asset.wsname.values:
             return True
         else:
             return False
 
-    def _is_asset(self, name_asset: str) -> bool:
+    def _is_asset(self, code_asset: str) -> bool:
         """
         Check that the asset exists
         :param name_asset: Name of the asset
         :return: Return true if the asset exist
         """
-        if name_asset in self.assets.altname.index:
-            return True
-        else:
-            logger.warning("Asset {} don't exist".format(name_asset))
-            return False
+        with open('../codes/asset_code.json') as json_file:
+            codes_assets = json.load(json_file)
+            if code_asset in codes_assets:
+                return True
+            else:
+                logger.warning("Asset {} don't exist".format(code_asset))
+                return False
 
     def _get_signature(self,urlpath: str, data: json):
         """

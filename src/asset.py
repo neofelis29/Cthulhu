@@ -27,7 +27,10 @@ class Asset:
         Allows you to retrieve the asset's google trend data for the month.
         :return:
         """
-        self.trend.build_payload([self.name], timeframe='today 1-m', geo='FR')
+        self.trend.build_payload([self.altname], timeframe='today 1-m', geo='FR')
         return self.trend.interest_over_time()
+
+
+
 
 
