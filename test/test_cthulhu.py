@@ -59,4 +59,4 @@ class TestVastAPI(unittest.TestCase):
     @ignore_warnings
     def test_trend(self):
         asset = self.cthulhu.get_asset("BTC")
-        print(asset.get_data())
+        print(asset.get_data_google_trend())

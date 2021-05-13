@@ -22,7 +22,11 @@ class Asset:
             setattr(self, key, value)
         self.trend = TrendReq(hl='FR', tz=360)
 
-    def get_data(self) -> json:
+    def get_data_google_trend(self) -> pd.DataFrame:
+        """
+        Allows you to retrieve the asset's google trend data for the month.
+        :return:
+        """
         self.trend.build_payload([self.name], timeframe='today 1-m', geo='FR')
         return self.trend.interest_over_time()
 
