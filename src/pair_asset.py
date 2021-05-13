@@ -18,9 +18,9 @@ from src.utils import convert_timestamp_to_date
 KRAKEN_API_KEY = os.getenv("KRAKEN_API_PRIVATE_KEY", default="")
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
 ASSETPAIRS = "/0/public/AssetPairs?pair={}"
-TICKER_INFORMATION = "/0/public/Ticker?pair={}"
-OHLC="/0/public/OHLC?pair={}"
-
+TICKER_INFORMATION = "/0/public/Ticker&pair={}"
+OHLC="/0/public/OHLC?pair={}&interval={}"
+TIME_INTERVAL = [1,5,15,30,60,240,1440,10080,21600]
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -78,11 +78,22 @@ class AssetPair:
         return resp_ticker_inf.json()
 
     def get_data(self, interval: int) -> pd.Dataframe:
-        ohlc = OHLC.format(self.altname, interval)
-        resp_status = requests.get(KRAKEN_DOMAIN.format(ohlc)).json()
-        del resp_status["result"]["last"]
-        data = pd.DataFrame.from_dict(resp_status["result"])
-        column_name = data.columns[0]
-        data = pd.DataFrame(data[column_name].tolist(), columns=['time', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
-        data.time = data.apply(lambda x: convert_timestamp_to_date(x.time), axis=1)
-        return data
+        """
+        interval should should be one of this: 1 5 15 30 60 240 1440 10080 21600
+        :param interval: Enum(1 5 15 30 60 240 1440 10080 21600)
+        :return:
+        """
+        if interval in TIME_INTERVAL:
+            ohlc = OHLC.format(self.altname, interval)
+            logger.info("Request: {}".format(KRAKEN_DOMAIN.format(ohlc, interval)))
+            resp_status = requests.get(KRAKEN_DOMAIN.format(ohlc)).json()
+            del resp_status["result"]["last"]
+            data = pd.DataFrame.from_dict(resp_status["result"])
+            column_name = data.columns[0]
+            data = pd.DataFrame(data[column_name].tolist(), columns=['time', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
+            data.time = data.apply(lambda x: convert_timestamp_to_date(x.time), axis=1)
+            data = data.set_index("time")
+            data = data.astype(float)
+            return data
+        else:
+            return ""
