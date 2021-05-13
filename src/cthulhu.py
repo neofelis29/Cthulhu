@@ -114,7 +114,7 @@ class Cthulhu:
         if self._is_pair_asset(asset_one, asset_two):
             pair_asset_name = "{}/{}".format(asset_one.name, asset_two.name)
             trbl = self.tradable_asset.loc[pair_asset_name]
-            return AssetPair(trbl)
+            return AssetPair(pair_asset_name, trbl)
         else:
             raise BaseException ("Error: pair asset don't exist")
 

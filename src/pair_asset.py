@@ -13,6 +13,7 @@ from pandas import DataFrame
 from pip._vendor import requests
 
 from src.asset import Asset
+from src.utils import convert_timestamp_to_date
 
 KRAKEN_API_KEY = os.getenv("KRAKEN_API_PRIVATE_KEY", default="")
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
@@ -32,7 +33,7 @@ class AssetPair:
         for key, value in resp_asset.to_dict().items():
             setattr(self, key, value)
 
-    def get_information(self):
+    def get_ticker_information(self):
         """
         a
         Array of strings
