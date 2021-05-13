@@ -33,7 +33,7 @@ class TestVastAPI(unittest.TestCase):
         asset = self.cthulhu.get_asset("BTC")
         asset_2 = self.cthulhu.get_asset("EUR")
         pair_asset = self.cthulhu.get_pair_asset(asset, asset_2)
-        print(pair_asset.get_information())
+        print(pair_asset.get_ticker_information())
 
     def test_get_balance(self):
         print(self.cthulhu.get_balance())

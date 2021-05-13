@@ -26,7 +26,6 @@ KRAKEN_API_KEY = os.getenv("KRAKEN_API_KEY", default="")
 
 KRAKEN_URL =  "https://api.kraken.com"
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
-ASSETPAIRS = "/0/public/AssetPairs?pair={}"
 TICKER_INFORMATION = "Ticker?pair={}"
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
