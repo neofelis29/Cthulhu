@@ -18,7 +18,7 @@ from src.utils import convert_timestamp_to_date
 KRAKEN_API_KEY = os.getenv("KRAKEN_API_PRIVATE_KEY", default="")
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
 ASSETPAIRS = "/0/public/AssetPairs?pair={}"
-TICKER_INFORMATION = "/0/public/Ticker&pair={}"
+TICKER_INFORMATION = "/0/public/Ticker?pair={}"
 OHLC="/0/public/OHLC?pair={}&interval={}"
 TIME_INTERVAL = [1,5,15,30,60,240,1440,10080,21600]
 
@@ -28,8 +28,9 @@ logging.basicConfig(level=logging.INFO)
 
 class AssetPair:
 
-    def __init__(self, asset_pair_name: str, resp_asset: pd.Series):
-        self.name = asset_pair_name
+    def __init__(self, asset_one: Asset, asset_two: Asset, resp_asset: pd.Series):
+        self.name = asset_one.altname+"/"+asset_two.altname
+        resp_asset = resp_asset
         for key, value in resp_asset.to_dict().items():
             setattr(self, key, value)
 
@@ -73,9 +74,10 @@ class AssetPair:
         :return:
         """
         ticker_information = TICKER_INFORMATION.format(self.altname)
-        logger.info(TICKER_INFORMATION.format(KRAKEN_DOMAIN.format(ticker_information)))
+        logger.info(KRAKEN_DOMAIN.format(ticker_information))
         resp_ticker_inf = requests.get(KRAKEN_DOMAIN.format(ticker_information))
-        return resp_ticker_inf.json()
+        resp_df = pd.DataFrame(resp_ticker_inf.json().get("result"))
+        return resp_df
 
     def get_data(self, interval: int) -> pd.Dataframe:
         """
