@@ -5,6 +5,7 @@ import os
 from pip._vendor import requests
 from dotenv import load_dotenv, find_dotenv
 from src.cthulhu import Cthulhu
+from src.utils import graph_timestamp
 
 load_dotenv()
 
@@ -44,3 +45,4 @@ class TestVastAPI(unittest.TestCase):
         pair_asset = self.cthulhu.get_pair_asset(asset, asset_2)
         data = pair_asset.get_data(60)
         self.assertIsNotNone(data)
+        graph_timestamp(data[["high", "low"]], asset.name+"/"+asset_2.name)
