@@ -18,6 +18,8 @@ KRAKEN_API_KEY = os.getenv("KRAKEN_API_PRIVATE_KEY", default="")
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
 ASSETPAIRS = "/0/public/AssetPairs?pair={}"
 TICKER_INFORMATION = "/0/public/Ticker?pair={}"
+OHLC="/0/public/OHLC?pair={}"
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +27,8 @@ logging.basicConfig(level=logging.INFO)
 
 class AssetPair:
 
-    def __init__(self, resp_asset: pd.Series):
+    def __init__(self, asset_pair_name: str, resp_asset: pd.Series):
+        self.name = asset_pair_name
         for key, value in resp_asset.to_dict().items():
             setattr(self, key, value)
 
@@ -72,3 +75,8 @@ class AssetPair:
         logger.info(TICKER_INFORMATION.format(KRAKEN_DOMAIN.format(ticker_information)))
         resp_ticker_inf = requests.get(KRAKEN_DOMAIN.format(ticker_information))
         return resp_ticker_inf.json()
+
+    def get_data(self, interval: int) -> pd.Dataframe:
+        ohlc = OHLC.format(self.altname, interval)
+        resp_status = requests.get(KRAKEN_DOMAIN.format(ohlc))
+        return pd.DataFrame.from_dict(resp_status.json()["result"])

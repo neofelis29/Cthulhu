@@ -37,3 +37,10 @@ class TestVastAPI(unittest.TestCase):
 
     def test_get_balance(self):
         print(self.cthulhu.get_balance())
+
+    def test_ohclc(self):
+        asset = self.cthulhu.get_asset("BTC")
+        asset_2 = self.cthulhu.get_asset("EUR")
+        pair_asset = self.cthulhu.get_pair_asset(asset, asset_2)
+        data = pair_asset.get_data(60)
+        self.assertIsNotNone(data)
