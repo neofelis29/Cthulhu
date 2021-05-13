@@ -79,5 +79,10 @@ class AssetPair:
 
     def get_data(self, interval: int) -> pd.Dataframe:
         ohlc = OHLC.format(self.altname, interval)
-        resp_status = requests.get(KRAKEN_DOMAIN.format(ohlc))
-        return pd.DataFrame.from_dict(resp_status.json()["result"])
+        resp_status = requests.get(KRAKEN_DOMAIN.format(ohlc)).json()
+        del resp_status["result"]["last"]
+        data = pd.DataFrame.from_dict(resp_status["result"])
+        column_name = data.columns[0]
+        data = pd.DataFrame(data[column_name].tolist(), columns=['time', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
+        data.time = data.apply(lambda x: convert_timestamp_to_date(x.time), axis=1)
+        return data
