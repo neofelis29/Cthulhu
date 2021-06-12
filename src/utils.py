@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,3 +28,14 @@ def logger_init():
     if (root_logger.hasHandlers()):
         root_logger.handlers.clear()
     root_logger.addHandler(console_handler)
+
+def cast_to_kraken_list(list_of_elements: List[str]) -> str:
+    """
+    Cast into comma delimited list elements in string
+    :param list_of_elements: List of the elements
+    :return: Return a listt in string delimited with comma
+    """
+    list_kraken_format = ""
+    for element in list_of_elements:
+        list_kraken_format = list_kraken_format + element + ", "
+    return list_kraken_format[:-2]

@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import urllib
+from typing import List
 
 import pandas as pd
 from dotenv import load_dotenv, find_dotenv
@@ -18,6 +19,7 @@ from pip._vendor import requests
 
 from src.asset import Asset
 from src.pair_asset import AssetPair
+from src.utils import cast_to_kraken_list
 
 load_dotenv()
 
@@ -200,3 +202,15 @@ class Cthulhu:
         resp = self._request('/0/private/ClosedOrders', {"nonce": str(int(1000 * time.time())), "userref": 36493663})
         return resp
 
+    def get_information_orders(self, ids_list: List[str]) -> json:
+        """
+        Retrieve information about specific orders.
+        :param ids: List of ids of the orders
+        :return: Json informations about the specific orders
+        """
+        string_list_ids = cast_to_kraken_list(ids_list)
+        resp = self._request('/0/private/QueryOrders', {
+            "nonce": str(int(1000 * time.time())),
+            "txid": string_list_ids,
+            "trades": True})
+        return resp

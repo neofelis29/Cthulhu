@@ -175,7 +175,6 @@ class AssetPair:
         for params in all_params:
             m = Prophet(**params)
             # Fit model with given m.add_regressor('add1')
-            m.add_regressor('close')
             m.fit(input_data_model)
 
             df_cv = cross_validation(m, horizon='2 days', parallel="processes")
