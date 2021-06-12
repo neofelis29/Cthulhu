@@ -184,3 +184,11 @@ class Cthulhu:
         resp = self._request('/0/private/Balance', {"nonce": str(int(1000 * time.time()))})
         return resp
 
+    def get_open_orders(self) -> json:
+        """
+        Retrieve information about the open order of the account
+        :return: Json information about the open order
+        """
+        resp = self._request('/0/private/OpenOrders', {"nonce": str(int(1000 * time.time())), "trades": True})
+        return resp
+

@@ -2,6 +2,8 @@ import unittest
 import pandas as pd
 import os
 from dotenv import load_dotenv
+
+from src.User import User
 from src.cthulhu import Cthulhu
 import warnings
 
@@ -74,3 +76,7 @@ class TestVastAPI(unittest.TestCase):
         asset_2 = self.cthulhu.get_asset("Euro")
         pair_asset = self.cthulhu.get_pair_asset(asset, asset_2)
         pair_asset.predict_crypto_currency_optimized(graph=True)
+
+    def test_client_get_open_orders(self):
+        client = User(self.cthulhu)
+        self.assertIsNotNone(client.open_orders)
