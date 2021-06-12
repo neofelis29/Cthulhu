@@ -24,7 +24,7 @@ load_dotenv()
 KRAKEN_API_PRIVATE_KEY = os.getenv("KRAKEN_API_PRIVATE_KEY", default="")
 KRAKEN_API_KEY = os.getenv("KRAKEN_API_KEY", default="")
 
-KRAKEN_URL =  "https://api.kraken.com"
+KRAKEN_URL = "https://api.kraken.com"
 KRAKEN_DOMAIN = "https://api.kraken.com{}"
 TICKER_INFORMATION = "Ticker?pair={}"
 logger = logging.getLogger(__name__)
@@ -114,10 +114,10 @@ class Cthulhu:
         """
         if self._is_pair_asset(asset_one, asset_two):
             pair_asset_name = "{}/{}".format(asset_one.altname, asset_two.altname)
-            trdbl = self.tradable_asset.loc[(self.tradable_asset.wsname==pair_asset_name)]
+            trdbl = self.tradable_asset.loc[(self.tradable_asset.wsname == pair_asset_name)]
             return AssetPair(asset_one, asset_two, trdbl.squeeze(axis=0))
         else:
-            raise BaseException ("Error: pair asset don't exist")
+            raise BaseException("Error: pair asset don't exist")
 
     def _is_pair_asset(self, asset_one: Asset, asset_two: Asset) -> bool:
         """
@@ -147,7 +147,7 @@ class Cthulhu:
                 logger.warning("Asset {} don't exist".format(code_asset))
                 return False
 
-    def _get_signature(self,urlpath: str, data: json):
+    def _get_signature(self, urlpath: str, data: json):
         """
         Create the signature to connect to the Kraken API
         :param urlpath: Url which be given in post method
@@ -190,5 +190,13 @@ class Cthulhu:
         :return: Json information about the open order
         """
         resp = self._request('/0/private/OpenOrders', {"nonce": str(int(1000 * time.time())), "trades": True})
+        return resp
+
+    def get_closed_orders(self) -> json:
+        """
+        Retrieve information about the closed order of the account
+        :return: Json information about the closed order
+        """
+        resp = self._request('/0/private/ClosedOrders', {"nonce": str(int(1000 * time.time())), "userref": 36493663})
         return resp
 

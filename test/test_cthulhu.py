@@ -80,3 +80,7 @@ class TestVastAPI(unittest.TestCase):
     def test_client_get_open_orders(self):
         client = User(self.cthulhu)
         self.assertIsNotNone(client.open_orders)
+
+    def test_client_get_closed_orders(self):
+        client = User(self.cthulhu)
+        self.assertIsNotNone(client.closed_orders)
