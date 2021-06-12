@@ -1,9 +1,10 @@
 import json
-from typing import List
+from typing import List, Tuple
 from src.cthulhu import Cthulhu
 import pandas as pd
 from scipy import stats
 import datetime as dt
+
 
 class User:
     def __init__(self, cthulhu: Cthulhu):
@@ -53,3 +54,10 @@ class User:
         return slope
 
 
+    def _get_min_max(self, prediction_trend: pd.DataFrame) -> Tuple[float, float]:
+        """
+        Get the min max of prediction
+        :param prediction_trend: Dataframe of prediction trend
+        :return: Return mni and max value of prediction
+        """
+        return prediction_trend["trend"].min(), prediction_trend["trend"].max()

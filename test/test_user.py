@@ -32,3 +32,8 @@ class TestVastAPI(unittest.TestCase):
     def test_get_slope_prediction_trend(self):
         pred = self.user.get_prediction("Energy Web Token", "Euro")
         self.user._get_slope_prediction_trend(pred)
+
+    def test_get_min_max_prediction_trend(self):
+        pred = self.user.get_prediction("Energy Web Token", "Euro")
+        min, max = self.user._get_min_max(pred)
+        self.assertGreater(max, min)
