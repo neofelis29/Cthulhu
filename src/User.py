@@ -2,7 +2,8 @@ import json
 from typing import List
 from src.cthulhu import Cthulhu
 import pandas as pd
-
+from scipy import stats
+import datetime as dt
 
 class User:
     def __init__(self, cthulhu: Cthulhu):
@@ -11,7 +12,7 @@ class User:
         self.open_orders = cthulhu.get_open_orders()["result"]
         self.closed_orders = cthulhu.get_closed_orders()
 
-    def get_open_orders(self) -> pd.Dataframe:
+    def get_open_orders(self) -> pd.DataFrame:
         """
         Get open order information
         :return: Information of open order
@@ -26,7 +27,7 @@ class User:
         """
         return pd.DataFrame(self.cthulhu.get_information_orders(ids_list)["result"]).transpose().reset_index().rename(columns={"index": "id"})
     
-    def _get_prediction(self, asset_name_1: str, asset_name_2: str) -> pd.DataFrame:
+    def get_prediction(self, asset_name_1: str, asset_name_2: str) -> pd.DataFrame:
         """
         Compute prediction currency of the asset given
         :param asset_name_1: Asset name
@@ -41,5 +42,14 @@ class User:
             return result.iloc[:7*24]
         else:
             return None
-    
+
+    def _get_slope_prediction_trend(self, prediction_trend: pd.DataFrame) -> float:
+        """
+        Compute slop of crypto currency prediction
+        :return: The slope of prediction computed
+        """
+        prediction_trend['date_ordinal'] = pd.to_datetime(prediction_trend['ds']).map(dt.datetime.toordinal)
+        slope, intercept, r_value, p_value, std_err = stats.linregress(prediction_trend['date_ordinal'], prediction_trend['trend'])
+        return slope
+
 

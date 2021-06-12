@@ -28,3 +28,7 @@ class TestVastAPI(unittest.TestCase):
     def test_prediction(self):
         pred = self.user.get_prediction("Energy Web Token", "Euro")
         self.assertIsNotNone(pred)
+
+    def test_get_slope_prediction_trend(self):
+        pred = self.user.get_prediction("Energy Web Token", "Euro")
+        self.user._get_slope_prediction_trend(pred)
