@@ -140,11 +140,8 @@ class AssetPair:
     def predict_crypto_currency_optimized(self, optional_input_data_list: List[str] = None, graph: bool = False,
                                           forecasting_time: int = 24 * 2) -> Tuple[bool, pd.Dataframe]:
         """
-        Compute prediction with the current information of the pair of asset with Prophet model with the best parameter found in a grid search
-        :param optional_input_data_list: List of the optional data to give to the Prophet model
-        :param graph: If graph is True the plot is computed otherwise not
-        :param forecasting_time: The time in hours we want to predict
-        :return: The prediction of the crypto currency
+
+        :param forecasting_time: Time to predict in hours
         """
         best_params = self.find_best_params_prophet_model()
         prophet_model = Prophet(changepoint_prior_scale=best_params["changepoint_prior_scale"], seasonality_prior_scale=best_params["seasonality_prior_scale"])
@@ -152,6 +149,7 @@ class AssetPair:
         if self._check_optional_input_data_list(optional_input_data_list):
             for optional_input_data in optional_input_data_list:
                 prophet_model.add_regressor(optional_input_data, standardize=False)
+
         prophet_model.fit(input_data_model)
         future = prophet_model.make_future_dataframe(periods=forecasting_time, freq='H')
         forecast = prophet_model.predict(df=future)
@@ -177,7 +175,9 @@ class AssetPair:
         for params in all_params:
             m = Prophet(**params)
             # Fit model with given m.add_regressor('add1')
+            m.add_regressor('close')
             m.fit(input_data_model)
+
             df_cv = cross_validation(m, horizon='2 days', parallel="processes")
             df_p = performance_metrics(df_cv, rolling_window=1)
             rmses.append(df_p['rmse'].values[0])

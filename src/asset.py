@@ -7,14 +7,13 @@ import plotly.express as px
 
 warnings.simplefilter("ignore", ResourceWarning)
 
-
 class Asset:
     def __init__(self, asset_name: str, resp_asset: pd.Series):
         self.name = asset_name
         for key, value in resp_asset.to_dict().items():
             setattr(self, key, value)
         self.trend = TrendReq(hl='FR', tz=360)
-        self.data = self._get_data_google_trend()
+        self.data =  self._get_data_google_trend()
 
     def _get_data_google_trend(self) -> pd.DataFrame:
         """
@@ -28,8 +27,8 @@ class Asset:
         data = data.resample('1H').interpolate('linear').to_frame().reset_index()
         data_asset = data[columns_name[0]]
         data_time = pd.to_datetime(data['date'], format='%Y-%m-%d %H:%M:%S')
-        data = pd.concat([data_time, data_asset], axis=1)
-        data = data.rename(columns={"date": "time"})
+        data = pd.concat([data_time,data_asset], axis=1)
+        data = data .rename(columns={"date": "time"})
         data = data.set_index("time")
         return data
 
@@ -42,3 +41,7 @@ class Asset:
         fig = px.line(self.data[self.altname], title=self.name)
         fig.layout.template = 'plotly_dark'
         fig.show()
+
+
+
+
