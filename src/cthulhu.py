@@ -20,6 +20,8 @@ from pip._vendor import requests
 from src.asset import Asset
 from src.pair_asset import AssetPair
 from src.utils import cast_to_kraken_list
+from src.type import Type
+from src.order_type import Order_type
 
 load_dotenv()
 
@@ -119,7 +121,7 @@ class Cthulhu:
             trdbl = self.tradable_asset.loc[(self.tradable_asset.wsname == pair_asset_name)]
             return AssetPair(asset_one, asset_two, trdbl.squeeze(axis=0))
         else:
-            raise BaseException("Error: pair asset don't exist")
+            raise Exception ("Error: pair asset don't exist")
 
     def _is_pair_asset(self, asset_one: Asset, asset_two: Asset) -> bool:
         """
@@ -250,3 +252,13 @@ class Cthulhu:
             "txid": id
         })
         return True
+
+    def add_order(self, volume: float, pair: str, price: float, order_type: Order_type, type: Type) -> bool:
+        resp = self._request('/0/private/AddOrder', {
+            "nonce": str(int(1000 * time.time())),
+            "ordertype": order_type,
+            "type": type,
+            "volume": volume,
+            "pair": pair,
+            "price": price
+        })
