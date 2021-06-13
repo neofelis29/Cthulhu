@@ -67,5 +67,6 @@
   "XZEC":"Zcash",
   "ZKRW":"South Korean Won",
   "ZUSD": "US Dollar",
-  "KFEE": "Kraken Fee Credits"
+  "KFEE": "Kraken Fee Credits",
+  "EUR" : "Euro"
 }

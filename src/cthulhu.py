@@ -10,7 +10,7 @@ import subprocess
 import sys
 import time
 import urllib
-from typing import List
+from typing import List, Tuple
 
 import pandas as pd
 from dotenv import load_dotenv, find_dotenv
@@ -214,3 +214,27 @@ class Cthulhu:
             "txid": string_list_ids,
             "trades": True})
         return resp
+
+    def extract_asset_from_altname(self, altname: str) -> Tuple[str, str]:
+        """
+        Extract the name of asset from altname of pair of asset
+        :param altname: altname of pair of asset
+        :return: The name of the asset which compose the pair
+        """
+        if altname in self.tradable_asset.altname:
+            name = self.tradable_asset.wsname.loc[self.tradable_asset.altname == altname].tolist()[0]
+            asset_altname_list = name.split("/")
+            asset_name_one = self.cast_asset_name_to_altname(asset_altname_list[0])
+            asset_name_two = self.cast_asset_name_to_altname(asset_altname_list[1])
+            return asset_name_one, asset_name_two
+
+    def cast_asset_name_to_altname(self, asset_name):
+        """
+        Cast asset name to altname
+        :param asset_name:
+        :return: The altname of asset name
+        """
+        with open('../codes/asset_name.json') as json_file:
+            codes_assets = json.load(json_file)
+            if asset_name in codes_assets:
+                return codes_assets[asset_name]

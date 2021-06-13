@@ -91,4 +91,9 @@ class TestVastAPI(unittest.TestCase):
         id_order = open_orders.iloc[0].id
         list_order_ids = [id_order]
         information_order = client.get_information_orders(list_order_ids)
-        self.assertIsNotNone(information_order)
+        self.assertIsNotNone(information_order)        self.assertIsNotNone(information_order)
+
+    def test_extract_asset_from_altname(self):
+        asset_name_one, asset_name_two = self.cthulhu.extract_asset_from_altname("EWTEUR")
+        self.assertIsNotNone(asset_name_one)
+        self.assertIsNotNone(asset_name_two)
