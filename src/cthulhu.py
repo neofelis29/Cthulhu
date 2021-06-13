@@ -238,3 +238,15 @@ class Cthulhu:
             codes_assets = json.load(json_file)
             if asset_name in codes_assets:
                 return codes_assets[asset_name]
+
+    def cancel_order(self, id: str) -> bool:
+        """
+        Cancel a particular open order
+        :param id: Open order transaction ID
+        :return: True if succeed
+        """
+        resp = self._request('/0/private/CancelOrder', {
+            "nonce": str(int(1000 * time.time())),
+            "txid": id
+        })
+        return True
